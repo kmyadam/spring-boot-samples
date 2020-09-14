@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.poc.exception.AuthenticationException;
 import com.poc.model.AuthenticationRequest;
 import com.poc.model.AuthenticationResponse;
 import com.poc.util.JWTUtil;
@@ -50,11 +52,13 @@ public class DemoController {
 			authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword())
 			);
-		}
-		catch (BadCredentialsException e) {
-			throw new Exception("Incorrect username or password", e);
-		}
-
+		} catch (DisabledException e) {
+		    throw new AuthenticationException("USER_DISABLED", e);
+	    } catch (BadCredentialsException e) {
+	    	throw new AuthenticationException("INVALID_CREDENTIALS", e);
+	    } catch (Exception e) {
+	    	throw new Exception("INTERNAL_SERVER_ERROR", e);
+	    }
 
 		final UserDetails userDetails = userDetailsService
 				.loadUserByUsername(authenticationRequest.getUsername());
