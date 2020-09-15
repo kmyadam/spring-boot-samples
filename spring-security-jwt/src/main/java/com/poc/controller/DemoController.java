@@ -2,12 +2,14 @@ package com.poc.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -18,6 +20,7 @@ import com.poc.model.AuthenticationRequest;
 import com.poc.model.AuthenticationResponse;
 import com.poc.util.JWTUtil;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 public class DemoController {
 	
@@ -36,13 +39,21 @@ public class DemoController {
 	}
 
 	@RequestMapping("/admin")
+	@PreAuthorize("hasRole('ADMIN')")
 	public String admin() {
 		return "Welcome...Admin!";
 	}
 	
 	@RequestMapping("/user")
+	@PreAuthorize("hasAnyRole('USER','ADMIN')")
 	public String user() {
 		return "Welcome...User!";
+	}
+	
+	@RequestMapping("/userdelete")
+	@PreAuthorize("hasAuthority('DELETE_USER')")
+	public String userDelete() {
+		return "User DELETE API - Has access to ADMIN!";
 	}
 	
 	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)

@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.poc.entity.User;
 
 public class MyUserDetails implements UserDetails {
@@ -16,6 +17,7 @@ public class MyUserDetails implements UserDetails {
 	private static final long serialVersionUID = -455241517200995418L;
 	
 	private String userName;
+	@JsonIgnore
     private String password;
     private boolean active;
     private List<GrantedAuthority> authorities;
